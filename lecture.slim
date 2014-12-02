@@ -1,0 +1,347 @@
+section.center data-background="#000"
+  h2.white Concurrency & Ruby Implementations
+
+section.center
+  p This Thursday we have a special guest
+
+section.center
+  p Don't miss Testing Ruby by Radoslav Stankov
+
+section.center data-background="#000"
+  h2.white Questions
+
+section.center
+  p What is a scope gate?
+
+section.center
+  p Which are the keywords that introduce scope gates?
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      def feed(*meals)
+        super()
+      end
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      def feed(*meals)
+        super
+      end
+
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      o = Object.new
+
+      def o.to_a
+        [o]
+      end
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      o = Object.new
+
+      class << o
+        def to_a
+          [o]
+        end
+      end
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      result == class Foo
+        class << self
+          self
+        end
+      end
+
+      Foo.singleton_class == result
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      o = Object.new
+
+      def o.to_str
+        bar
+      end
+
+      "foo" + bar
+
+section.center
+  p What is this called?
+
+section.center
+  p What do we use it for?
+
+section.center
+  p What does instance_eval does?
+
+section.center
+  p What does class_eval does?
+
+section.center
+  p What's the difference?
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      Object.superclass
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      BasicObject.superclass
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      Class.new.superclass
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      Class.new(Array).superclass
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      Module.new.superclass
+
+section.center
+  img.inline src="img/troll.png"
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      A = Class.new
+      B = Class.new(A)
+
+      A.singleton_class.superclass == # ?
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      A = Class.new
+      B = Class.new(B)
+
+      A.singleton_class.superclass == B.singleton_class
+
+section.center
+  img.inline src="img/troll.png"
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      A = Class.new
+      B = Class.new(B)
+
+      B.singleton_class.superclass == A.singleton_class
+
+section.center data-background="#000"
+  p.white The _____ class of the _________ class is the _________ class of the _____ class
+
+section data-background="http://www.boomerang-academy.fr/operations/gif-adventure-time/gif1.gif"
+
+section.center data-background="#F00"
+  h2.white Global Interpreter Lock
+
+section.center
+  p Global Interpreter Lock (GIL) is a mechanism used in computer language interpreters to synchronize the execution of threads so that only one thread can execute at a time
+
+section.center
+  p An interpreter which uses GIL will always allow exactly one thread to execute at a time, even if run on a multi-core processor
+
+section.center
+  p GIL is a mutual exclusion lock held by a programming language interpreter thread to avoid sharing code that is not thread-safe with other threads
+
+section.center
+  p Effectively limits the amount of parallelism reachable through concurrency of a single interpreter process with multiple threads
+
+section.center data=backgroun="#000"
+  p CRuby uses a Global Interpreter Lock
+
+section.center
+  p Affects CPU-bound programs and not IO-bound programs, which are the majority of Ruby programs
+
+section.center data-background="#0F0"
+  h2.white Threads
+
+section.center
+  p Threads are the Ruby implementation for a concurrent programming model
+
+section.center
+  p Programs that require multiple threads of execution are a perfect candidate for Ruby's Thread class
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      thr = Thread.new { puts "Whats the big deal" }
+
+section.center
+  p We can pause the execution of the main thread and allow our new thread to finish with Thread#join
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      thr.join #=> "Whats the big deal"
+
+section.center
+  p If we don't call thr.join before the main thread terminates, then all other threads including thr will be killed
+
+section.center
+  p Alternatively, you can use an array for handling multiple threads at once
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      threads = []
+      threads << Thread.new { puts "Whats the big deal" }
+      threads << Thread.new { 3.times { puts "Threads are fun!" } }
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      threads.each { |thr| thr.join }
+
+section.center data-background="#00F"
+  h2.white Initialization
+
+section.center
+  p In order to create new threads, Ruby provides ::new, ::start, and ::fork
+
+section.center
+  p A block must be provided with each of these methods, otherwise a ThreadError will be raised
+
+section.center
+  p When subclassing the Thread class, the initialize method of your subclass will be ignored by ::start and ::fork
+
+section.center
+  p Otherwise, be sure to call super in your initialize method
+
+section.center data-background="#00F"
+  h2.white Termination
+
+section.center
+  p For terminating threads, Ruby provides the class method ::kill
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      thr = Thread.new { ... }
+      Thread.kill(thr) # sends exit() to thr
+
+section.center
+  p Alternatively, you can use the instance method exit, or any of its aliases kill or terminate
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      thr = Thread.new { ... }
+      thr.kill
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      thr = Thread.new { ... }
+      thr.exit
+
+section.center data-background="#00F"
+  h2.white Status
+
+section.center
+  p Ruby provides a few instance methods for querying the state of a given thread
+
+section.center
+  p To get a string with the current thread's state use status
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      thr = Thread.new { sleep }
+      thr.status # => "sleep"
+      thr.exit
+      thr.status # => false
+
+section.center
+  p You can also use alive? to tell if the thread is running or sleeping, and stop? if the thread is dead or sleeping
+
+section.center data-background="#00F"
+  h2.white Variables & Scope
+
+section.center
+  p Threads are created with blocks
+
+section.center
+  p The same rules apply to other Ruby blocks for variable scope
+
+section.center
+  p Any local variables created within this block are accessible to only this thread
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      Thread.new do
+        Thread.current.thread_variable_set(:foo, 1)
+        p Thread.current.thread_variable_get(:foo) # => 1
+      end
+
+section.center
+  p Each fiber has its own bucket for #[] storage
+
+section.center
+  p When you set a new fiber-local it is only accessible within this Fiber
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      Thread.new do
+        Thread.current[:foo] = "bar"
+        Fiber.new do
+          p Thread.current[:foo] # => nil
+        end.resume
+      end.join
+
+section.center
+  pre: code.ruby contenteditable="true"
+    '
+      Thread.new do
+        Thread.current.thread_variable_set(:foo, 1)
+        p Thread.current.thread_variable_get(:foo) # => 1
+        Fiber.new do
+          Thread.current.thread_variable_set(:foo, 2)
+          p Thread.current.thread_variable_get(:foo) # => 2
+        end.resume
+        p Thread.current.thread_variable_get(:foo)   # => 2
+      end.join
+
+section.center data-background="#00F"
+  h2.white Exceptions
+
+section.center
+  p Any thread can raise an exception using the #raise instance method, which operates similarly to Kernel#raise
+
+section.center
+  p However, it's important to note that an exception that occurs in any thread except the main thread depends on abort_on_exception
+
+section.center
+  p This option is false by default, meaning that any unhandled exception will cause the thread to terminate silently when waited on by either join or value
+
+section.center
+  p You can change this default by either abort_on_exception= true or setting $DEBUG to true
+
+section.center
+  p With the addition of the class method ::handle_interrupt, you can now handle exceptions asynchronously with threads.
+
+section.center data-background="#000"
+  p.white A programmer had a problem, so he decided to use threads
+
+section.center data-background="#000"
+  p.white Now 2 has He problems
+
+section data-background="http://replygif.net/i/411.gif"

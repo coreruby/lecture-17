@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Concurrency & Ruby Implementations</title>
+    <meta content="" name="description" />
+    <meta content="" name="author" />
+    <link href="css/reveal.css" rel="stylesheet" />
+    <link href="css/simple.css" rel="stylesheet" />
+    <link href="css/googlecode.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section class="center" data-background="#000">
+  <h2 class="white">
+    Concurrency & Ruby Implementations
+  </h2>
+</section>
+<section class="center">
+  <p>
+    This Thursday we have a special guest
+  </p>
+</section>
+<section class="center">
+  <p>
+    Don't miss Testing Ruby by Radoslav Stankov
+  </p>
+</section>
+<section class="center" data-background="#000">
+  <h2 class="white">
+    Questions
+  </h2>
+</section>
+<section class="center">
+  <p>
+    What is a scope gate?
+  </p>
+</section>
+<section class="center">
+  <p>
+    Which are the keywords that introduce scope gates?
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">def feed(*meals)
+  super()
+end </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">def feed(*meals)
+  super
+end </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">o = Object.new
+
+def o.to_a
+  [o]
+end </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">o = Object.new
+
+class << o
+  def to_a
+    [o]
+  end
+end </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">result == class Foo
+  class << self
+    self
+  end
+end
+
+Foo.singleton_class == result </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">o = Object.new
+
+def o.to_str
+  bar
+end
+
+"foo" + bar </code></pre>
+</section>
+<section class="center">
+  <p>
+    What is this called?
+  </p>
+</section>
+<section class="center">
+  <p>
+    What do we use it for?
+  </p>
+</section>
+<section class="center">
+  <p>
+    What does instance_eval does?
+  </p>
+</section>
+<section class="center">
+  <p>
+    What does class_eval does?
+  </p>
+</section>
+<section class="center">
+  <p>
+    What's the difference?
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">Object.superclass </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">BasicObject.superclass </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">Class.new.superclass </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">Class.new(Array).superclass </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">Module.new.superclass </code></pre>
+</section>
+<section class="center">
+  <img class="inline" src="img/troll.png" />
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">A = Class.new
+B = Class.new(A)
+
+A.singleton_class.superclass == # ? </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">A = Class.new
+B = Class.new(B)
+
+A.singleton_class.superclass == B.singleton_class </code></pre>
+</section>
+<section class="center">
+  <img class="inline" src="img/troll.png" />
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">A = Class.new
+B = Class.new(B)
+
+B.singleton_class.superclass == A.singleton_class </code></pre>
+</section>
+<section class="center" data-background="#000">
+  <p class="white">
+    The _____ class of the _________ class is the _________ class of the _____ class
+  </p>
+</section>
+<section data-background="http://www.boomerang-academy.fr/operations/gif-adventure-time/gif1.gif"></section>
+<section class="center" data-background="#F00">
+  <h2 class="white">
+    Global Interpreter Lock
+  </h2>
+</section>
+<section class="center">
+  <p>
+    Global Interpreter Lock (GIL) is a mechanism used in computer language interpreters to synchronize the execution of threads so that only one thread can execute at a time
+  </p>
+</section>
+<section class="center">
+  <p>
+    An interpreter which uses GIL will always allow exactly one thread to execute at a time, even if run on a multi-core processor
+  </p>
+</section>
+<section class="center">
+  <p>
+    GIL is a mutual exclusion lock held by a programming language interpreter thread to avoid sharing code that is not thread-safe with other threads
+  </p>
+</section>
+<section class="center">
+  <p>
+    Effectively limits the amount of parallelism reachable through concurrency of a single interpreter process with multiple threads
+  </p>
+</section>
+<section class="center" data="#000">
+  <p>
+    CRuby uses a Global Interpreter Lock
+  </p>
+</section>
+<section class="center">
+  <p>
+    Affects CPU-bound programs and not IO-bound programs, which are the majority of Ruby programs
+  </p>
+</section>
+<section class="center" data-background="#0F0">
+  <h2 class="white">
+    Threads
+  </h2>
+</section>
+<section class="center">
+  <p>
+    Threads are the Ruby implementation for a concurrent programming model
+  </p>
+</section>
+<section class="center">
+  <p>
+    Programs that require multiple threads of execution are a perfect candidate for Ruby's Thread class
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">thr = Thread.new { puts "Whats the big deal" } </code></pre>
+</section>
+<section class="center">
+  <p>
+    We can pause the execution of the main thread and allow our new thread to finish with Thread#join
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">thr.join #=> "Whats the big deal" </code></pre>
+</section>
+<section class="center">
+  <p>
+    If we don't call thr.join before the main thread terminates, then all other threads including thr will be killed
+  </p>
+</section>
+<section class="center">
+  <p>
+    Alternatively, you can use an array for handling multiple threads at once
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">threads = []
+threads << Thread.new { puts "Whats the big deal" }
+threads << Thread.new { 3.times { puts "Threads are fun!" } } </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">threads.each { |thr| thr.join } </code></pre>
+</section>
+<section class="center" data-background="#00F">
+  <h2 class="white">
+    Initialization
+  </h2>
+</section>
+<section class="center">
+  <p>
+    In order to create new threads, Ruby provides ::new, ::start, and ::fork
+  </p>
+</section>
+<section class="center">
+  <p>
+    A block must be provided with each of these methods, otherwise a ThreadError will be raised
+  </p>
+</section>
+<section class="center">
+  <p>
+    When subclassing the Thread class, the initialize method of your subclass will be ignored by ::start and ::fork
+  </p>
+</section>
+<section class="center">
+  <p>
+    Otherwise, be sure to call super in your initialize method
+  </p>
+</section>
+<section class="center" data-background="#00F">
+  <h2 class="white">
+    Termination
+  </h2>
+</section>
+<section class="center">
+  <p>
+    For terminating threads, Ruby provides the class method ::kill
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">thr = Thread.new { ... }
+Thread.kill(thr) # sends exit() to thr </code></pre>
+</section>
+<section class="center">
+  <p>
+    Alternatively, you can use the instance method exit, or any of its aliases kill or terminate
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">thr = Thread.new { ... }
+thr.kill </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">thr = Thread.new { ... }
+thr.exit </code></pre>
+</section>
+<section class="center" data-background="#00F">
+  <h2 class="white">
+    Status
+  </h2>
+</section>
+<section class="center">
+  <p>
+    Ruby provides a few instance methods for querying the state of a given thread
+  </p>
+</section>
+<section class="center">
+  <p>
+    To get a string with the current thread's state use status
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">thr = Thread.new { sleep }
+thr.status # => "sleep"
+thr.exit
+thr.status # => false </code></pre>
+</section>
+<section class="center">
+  <p>
+    You can also use alive? to tell if the thread is running or sleeping, and stop? if the thread is dead or sleeping
+  </p>
+</section>
+<section class="center" data-background="#00F">
+  <h2 class="white">
+    Variables & Scope
+  </h2>
+</section>
+<section class="center">
+  <p>
+    Threads are created with blocks
+  </p>
+</section>
+<section class="center">
+  <p>
+    The same rules apply to other Ruby blocks for variable scope
+  </p>
+</section>
+<section class="center">
+  <p>
+    Any local variables created within this block are accessible to only this thread
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">Thread.new do
+  Thread.current.thread_variable_set(:foo, 1)
+  p Thread.current.thread_variable_get(:foo) # => 1
+end </code></pre>
+</section>
+<section class="center">
+  <p>
+    Each fiber has its own bucket for #[] storage
+  </p>
+</section>
+<section class="center">
+  <p>
+    When you set a new fiber-local it is only accessible within this Fiber
+  </p>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">Thread.new do
+  Thread.current[:foo] = "bar"
+  Fiber.new do
+    p Thread.current[:foo] # => nil
+  end.resume
+end.join </code></pre>
+</section>
+<section class="center">
+  <pre><code class="ruby" contenteditable="true">Thread.new do
+  Thread.current.thread_variable_set(:foo, 1)
+  p Thread.current.thread_variable_get(:foo) # => 1
+  Fiber.new do
+    Thread.current.thread_variable_set(:foo, 2)
+    p Thread.current.thread_variable_get(:foo) # => 2
+  end.resume
+  p Thread.current.thread_variable_get(:foo)   # => 2
+end.join </code></pre>
+</section>
+<section class="center" data-background="#00F">
+  <h2 class="white">
+    Exceptions
+  </h2>
+</section>
+<section class="center">
+  <p>
+    Any thread can raise an exception using the #raise instance method, which operates similarly to Kernel#raise
+  </p>
+</section>
+<section class="center">
+  <p>
+    However, it's important to note that an exception that occurs in any thread except the main thread depends on abort_on_exception
+  </p>
+</section>
+<section class="center">
+  <p>
+    This option is false by default, meaning that any unhandled exception will cause the thread to terminate silently when waited on by either join or value
+  </p>
+</section>
+<section class="center">
+  <p>
+    You can change this default by either abort_on_exception= true or setting $DEBUG to true
+  </p>
+</section>
+<section class="center">
+  <p>
+    With the addition of the class method ::handle_interrupt, you can now handle exceptions asynchronously with threads.
+  </p>
+</section>
+<section class="center" data-background="#000">
+  <p class="white">
+    A programmer had a problem, so he decided to use threads
+  </p>
+</section>
+<section class="center" data-background="#000">
+  <p class="white">
+    Now 2 has He problems
+  </p>
+</section>
+<section data-background="http://replygif.net/i/411.gif"></section>
+      </div>
+    </div>
+    <script src="js/head.min.js"></script>
+    <script src="js/reveal.js"></script>
+    <script type="text/javascript">
+      Reveal.initialize({
+        width:  '100%',
+        height: '100%',
+        margin: 0.05,
+        controls: false,
+        progress: false,
+        history: true,
+        center: false,
+        rollingLinks: true,
+        transition: 'none',
+        backgroundTransition: 'none',
+        dependencies: [
+          {
+            src: 'js/highlight.js',
+            async: true,
+            callback: function() {
+              hljs.configure({ languages: ['ruby'] });
+              hljs.initHighlightingOnLoad();
+            }
+          }
+        ]
+      });
+    </script>
+  </body>
+</html>
